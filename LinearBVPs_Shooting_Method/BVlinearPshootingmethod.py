@@ -1,6 +1,8 @@
 #Created by Norhasliza Yusof for SIF3012 Course
 #program shooting method BVP using Runge-Kutta order 2
 #This code can be modify for RK4 or simplify in doing iteration in calling the integration.
+#This equation is to solve u"=-pi**2/4.0*(u+1)
+#The exact solution/analytical solution for this problem is u(x)=cos(pi*x/2)+2.0*sin(pi*x/2)-1
 
 import numpy as np
 import pandas as pd
@@ -44,7 +46,6 @@ for i in range(0,n):
       K22 = f2(x+h, y2+h*f2(x,y1,y2),y2)
       y22 = (y2 + (h/2.0)*(K12+K22))
     
-    #    x = x+h
       y1 = y11
       y2 = y22
 
@@ -59,7 +60,7 @@ for i in range(0,n):
       x = x+h
       y3 = y33
       y4 = y44
-#      print(i)
+
 
 # y1n and y3n are the boundaries at xn
 y1n = y1
@@ -91,7 +92,7 @@ for i in range(0,n):
     K22 = f2(x+h, y2+h*f2(x,y1,y2),y2)
     y22 = (y2 + (h/2.0)*(K12+K22))
         
-#    x = x+h
+
     y1 = y11
     y2 = y22
                 
@@ -113,6 +114,8 @@ for i in range(0,n):
     mpl.plot(x,yx,'xk')
 
 x = np.arange(0.0,1.25,0.25)
+#Here y is the exact solution/analytical solution for u"(x).
+#See the comment in the header for the full formula
 y = np.exp(2)*(np.exp(4)-1.0)**(-1)*(np.exp(2*x)-np.exp(-2*x))+x
 print(x,y)
 
