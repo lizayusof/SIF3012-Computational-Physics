@@ -25,7 +25,7 @@ v1 =[0.0]*(N+1)
 
 for j in range(N+1):
    x[j] = j*dx
-   u0[j] = np.exp(-0.5*((x[j]-x0/s)**2))
+   u0[j] = np.exp(-0.5*((x[j]-x0)/s)**2)
 
 #prepare animated plot
 mpl.ion()
