@@ -1,7 +1,7 @@
 #Created by Norhasliza Yusof for SIF3012 Course
 #program shooting method BVP using Runge-Kutta order 2
 #This code can be modify for RK4 or simplify in doing iteration in calling the integration.
-#This equation is to solve u"=-pi**2/4.0*(u+1)
+#This equation is to solve u"=-pi**2*(u+1)/4.0
 #The exact solution/analytical solution for this problem is u(x)=cos(pi*x/2)+2.0*sin(pi*x/2)-1
 
 import numpy as np
