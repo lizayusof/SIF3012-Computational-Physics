@@ -5,7 +5,7 @@
 #The exact solution/analytical solution for this problem is u(x)=cos(pi*x/2)+2.0*sin(pi*x/2)-1
 
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import matplotlib.pyplot as mpl
 
 def f1(x,y1,y2):
@@ -113,7 +113,7 @@ for i in range(0,n):
     print(i,x,yx)
     mpl.plot(x,yx,'xk')
 
-x = np.arange(0.0,1.25,0.25)
+x = np.arange(0.0,1.05,0.01)
 #Here y is the exact solution/analytical solution for u"(x).
 #See the comment in the header for the full formula
 y = np.exp(2)*(np.exp(4)-1.0)**(-1)*(np.exp(2*x)-np.exp(-2*x))+x
