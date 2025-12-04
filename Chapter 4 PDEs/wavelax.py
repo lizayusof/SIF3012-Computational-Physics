@@ -1,67 +1,129 @@
 import numpy as np
-import matplotlib.pyplot as mpl
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+# -----------------------------
+# Physical & numerical parameters
+# -----------------------------
+L = 1.0          # length of the string
+N = 200          # number of spatial intervals -> N+1 grid points
+dx = L / N
+
+c = 1.0          # wave speed
+
+# Choose dt to satisfy Courant condition: lambda = c*dt/dx <= 1
+lambda_cfl = 0.9         # pick something < 1 for safety
+dt = lambda_cfl * dx / c
+tmax = 2.0               # total simulation time
+
+# Gaussian pulse parameters (initial displacement)
+x0 = 0.3 * L             # centre of pulse
+sigma = 0.02             # width of pulse
+
+# -----------------------------
+# Grids
+# -----------------------------
+x = np.linspace(0.0, L, N + 1)
+lambda2 = (c * dt / dx) ** 2
+
+# -----------------------------
+# Initial conditions
+# -----------------------------
+# u(x,0) = exp(- (x-x0)^2 / (2*sigma^2) )
+u0 = np.exp(-0.5 * ((x - x0) / sigma) ** 2)
+
+# u_t(x,0) = 0  (string released from rest)
+# So first time step from Taylor expansion:
+u1 = np.copy(u0)
+# interior points j = 1,...,N-1
+u1[1:-1] = (
+    u0[1:-1]
+    + 0.5 * lambda2 * (u0[2:] - 2 * u0[1:-1] + u0[:-2])
+)
+
+# Fixed boundary: u(0,t) = u(L,t) = 0
+u0[0] = u0[-1] = 0.0
+u1[0] = u1[-1] = 0.0
+
+# Current and previous time levels
+u_prev = u0      # u^0
+u_curr = u1      # u^1
+
+t = 0.0          # current time (corresponds to u_curr)
+
+# -----------------------------
+# Set up Matplotlib figure
+# -----------------------------
+fig, ax = plt.subplots()
+line, = ax.plot(x, u_curr)
+ax.set_xlim(0.0, L)
+ax.set_ylim(-1.2, 1.2)
+ax.set_xlabel("x")
+ax.set_ylabel("u(x,t)")
+ax.set_title("Wave equation - stable central difference")
+
+# time label inside the axes
+time_text = ax.text(0.02, 0.95, f"t = {t:.3f}",
+                    transform=ax.transAxes,
+                    ha="left", va="top")
+
+plt.tight_layout()
+
+# -----------------------------
+# One time step of the scheme
+# -----------------------------
+def step():
+    global u_prev, u_curr, t
+
+    # allocate next time level
+    u_next = np.zeros_like(u_curr)
+
+    # apply the 3-level central-difference scheme at interior points
+    # u_j^{n+1} = 2 u_j^n - u_j^{n-1}
+    #             + lambda^2 (u_{j+1}^n - 2u_j^n + u_{j-1}^n)
+    u_next[1:-1] = (
+        2.0 * u_curr[1:-1]
+        - u_prev[1:-1]
+        + lambda2 * (u_curr[2:] - 2.0 * u_curr[1:-1] + u_curr[:-2])
+    )
+
+    # fixed boundary conditions
+    u_next[0] = 0.0
+    u_next[-1] = 0.0
+
+    # shift time levels: n -> n-1, n+1 -> n
+    u_prev, u_curr = u_curr, u_next
+
+    # advance time
+    t += dt
 
 
-#fixed parameters
-c = 300
-L = 1.0
-x0 = 0.3
-s = 0.02
+# -----------------------------
+# Animation callbacks
+# -----------------------------
+def init():
+    line.set_ydata(u_curr)
+    time_text.set_text(f"t = {t:.3f}")
+    return line, time_text
 
 
-
-#input parameters
-dx = L*float(input('grid spacing in units of wire lenght (L) ->'))
-dt = dx/c*float(input('time step in units of (dx/c) ->'))
-tmax = L/c*float(input('evolution time in units of (L/c) ->'))
-
-#construct initial data
-N = int(L/dx)
-x = [0.0]*(N+1)
-u0 =[0.0]*(N+1)
-v0 = [0.0]*(N+1)
-u1 =[0.0]*(N+1)
-v1 =[0.0]*(N+1)
-
-for j in range(N+1):
-   x[j] = j*dx
-   u0[j] = np.exp(-0.5*((x[j]-x0/s)**2))
-
-#prepare animated plot
-mpl.ion()
-(line,)=mpl.plot(x,u0,'-k')
-mpl.ylim(-1.2,1.2)
-mpl.xlabel('x(m)')
-mpl.ylabel('u')
-
-#perform evolution
-t = 0.0
-while t < tmax:
-     #update plot
-     line.set_ydata(u0)
-     mpl.title('t=%5f'%t)
-     mpl.draw()
-     mpl.pause(0.1)
-     #derivatives at interior points
-     for j in range(1,N):
-       v1[j]=0.5*(v0[j-1]+v0[j+1])+0.5*dt*c*(u0[j+1]-u0[j-1])/dx
-       u1[j]=0.5*(u0[j+1]+u0[j+1])+0.5*dt*c*(v0[j+1]-u0[j-1])/dx
-
-     #boundary conditions
-     u1[0]=u1[N]=0.0
-     v1[0]=v1[1]+u1[1]
-     v1[N]=v1[N-1]-u1[N-1]
-
-     #swap old and new lists
-     (u0,u1)=(u1,u0)
-     (v0,v1) = (v1,v0)
-     t += dt
-
-#freeze final plot
-mpl.ioff()
-mpl.show()
+def update(frame):
+    step()
+    line.set_ydata(u_curr)
+    time_text.set_text(f"t = {t:.3f}")
+    return line, time_text
 
 
+nframes = int(tmax / dt)
 
+ani = FuncAnimation(
+    fig,
+    update,
+    init_func=init,
+    frames=nframes,
+    interval=30,   # ms between frames
+    blit=True
+)
 
-
+plt.show()
+ 

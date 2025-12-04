@@ -40,10 +40,10 @@ b= lslinear.intercept
 mpl.scatter(df['Temperature'], df['Conductance'],label='Original Data')
 
 #calculate error bar from data and fitting
-yerr = (m*x+b)-y
+yerr = abs((m*x+b)-y)
 
 # The plot of the best straight line, Equation (1) in the Least Squares slides. 
-mpl.plot(x,m*x +b,color='red',label='Least Square Method')
+mpl.plot(x,m*x+b,color='red',label='Least Square Method')
 
 #add error bar
 mpl.errorbar(x,m*x+b,yerr,fmt='.k')
