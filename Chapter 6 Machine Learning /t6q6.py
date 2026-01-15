@@ -119,4 +119,4 @@ print('Method 2: ', ypredict2)
 plt.show()
 
 # Save the graph in the png format in an external file.
-plt.savefig('t4q6.png')
+plt.savefig('t6q6.png')

@@ -53,4 +53,4 @@ mat.legend()
 mat.show()
 
 # Save plot as png file. Remove whitespace around the image.
-mat.savefig('t4q3.png', bbox_inches='tight')
+mat.savefig('t6q3.png', bbox_inches='tight')

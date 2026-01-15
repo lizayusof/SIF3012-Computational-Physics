@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 # parameter skiprows.
 
 # Thermal conductivity of mercury.
-with open('t4q5.csv') as f:    
+with open('t6q5.csv') as f:    
     mydata = np.loadtxt(f, delimiter=',', skiprows=2)
 
 # [:,0] = data corresponding to all rows and just the first column.
